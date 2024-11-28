@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko"  xmlns:th="http://www.thymeleaf.org"
+                xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<th:block th:fragment="header">
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="javascript:void(0)">Security</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mynavbar">
+            <ul class="navbar-nav me-auto">
+                <!-- 로그인하지 않았을때(anonymous 상태) 보이는 메뉴 -->
+                <li class="nav-item" sec:authorize="isAnonymous()">
+                    <a class="nav-link" href="javascript:void(0)">Anonymous</a>
+                </li>
+                <!-- 로그인한 사람에게만 보이는 메뉴 -->
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <a class="nav-link" href="javascript:void(0)">Authenticated</a>
+                </li>
+                <!-- 로그인한 사람중 ROLE_MEMBER 나 ROLE_ADMIN 권한 있는 사람에게만 보이는 메뉴 -->
+                <li class="nav-item" sec:authorize="hasAnyRole('MEMBER', 'ADMIN')">
+                    <a class="nav-link" href="javascript:void(0)">Member</a>
+                </li>
+                <!-- 로그인한 사람중 ROLE_ADMIN 권한 있는 사람에게만 보이는 메뉴 -->
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                    <a class="nav-link" href="javascript:void(0)">Admin</a>
+                </li>
+            </ul>
+            <!-- 로그인 안했을때는 로그인 form 보여주기 -->
+            <a class="btn btn-primary" sec:authorize="isAnonymous()" type="submit" th:href="@{/user/login}">Login</a>
+
+            <!-- 로그인 했을때는 username 과 로그아웃 form 보여주기 -->
+            <form th:action="@{/user/logout}" method="POST" sec:authorize="isAuthenticated()" th:with="user=${#authentication.getPrincipal().getUser()}">
+                <!--TODO : 로그아웃후 다시 돌아오기 -->
+                <span class="d-flex">
+            <span class="text-light p-2"><span TODO="">[[${user.username}]]([[${user.name}]])</span> 님 환영합니다</span>
+            <span><button class="btn btn-danger" type="submit">Logout</button></span>
+          </span>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid mt-3">
+    <!-- 로그인 하지 않았을때 보여주는 화면 -->
+    <div sec:authorize="isAnonymous()" class="alert alert-warning alert-dismissible">
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        로그인하지 않은 상태입니다 <br>
+    </div>
+    <!-- 로그인 했을때 보여주는 화면 -->
+    <div sec:authorize="isAuthenticated()" class="alert alert-info alert-dismissible">
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div th:text="${#authentication.principal.user}"></div>
+        <div sec:authentication="principal.authorities"></div>
+        로그인 하셨습니다 <br>
+    </div>
+</div>
+</th:block>
+
+</html>
+
+

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lec.spring.repository.PostRepository">
+
+    <insert id="save" flushCache="true" parameterType="com.lec.spring.domain.Post"
+            useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO t5_post
+            (subject, content, user_id)
+        VALUES
+            (#{subject}, #{content}, #{user.id})
+    </insert>
+
+    <!-- 반복해서 사용될 쿼리문은 sql 태그로 정의 하고, include 태그로 가져다 쓸수 있다 -->
+    <sql id="SELECT_BASE">
+        SELECT
+            p.id "p_id",
+            p.subject "p_subject",
+            p.content "p_content",
+            p.viewcnt "p_viewCnt",
+            p.regdate "p_regDate",
+            u.id "u_id",
+            u.username "u_username",
+            u.password "u_password",
+            u.name "u_name",
+            u.email "u_email",
+            u.regdate "u_regdate"
+        FROM
+            t5_post p, t5_user u
+        WHERE
+            p.user_id = u.id
+    </sql>
+
+    <!--    Join 문에서 여러 테이블의 데이터를 자바개체로 매핑 받기-->
+    <resultMap id="mapUser" type="com.lec.spring.domain.User">
+        <result column="u_id" property="id"/>
+        <result column="u_username" property="username"/>
+        <result column="u_password" property="password"/>
+        <result column="u_name" property="name"/>
+        <result column="u_email" property="email"/>
+        <result column="u_regdate" property="regDate"/>
+    </resultMap>
+
+    <resultMap id="mapPost" type="com.lec.spring.domain.Post">
+        <result column="p_id" property="id"/>
+        <result column="p_subject" property="subject"/>
+        <result column="p_content" property="content"/>
+        <result column="p_viewcnt" property="viewCnt"/>
+        <result column="p_regdate" property="regDate"/>
+        <collection property="user" resultMap="mapUser"/>
+    </resultMap>
+
+    <select id="findAll" resultMap="mapPost">
+        <include refid="SELECT_BASE"/>
+        ORDER BY p.id DESC
+    </select>
+
+    <select id="findById" resultMap="mapPost">
+        <include refid="SELECT_BASE"/>
+        AND p.id = #{id}
+        ORDER BY p.id DESC
+    </select>
+
+    <update id="incViewCnt" flushCache="true">
+        UPDATE t5_post
+        SET viewcnt = viewcnt + 1
+        WHERE id = #{id}
+    </update>
+
+    <update id="update" flushCache="true"
+            parameterType="com.lec.spring.domain.Post">
+        UPDATE t5_post
+        SET subject = #{subject}, content = #{content}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete" flushCache="true"
+            parameterType="com.lec.spring.domain.Post">
+        DELETE FROM t5_post WHERE id = #{id}
+    </delete>
+
+    <!-- 페이징용 쿼리 -->
+    <select id="selectFromRow" resultMap="mapPost">
+        <include refid="SELECT_BASE"/>
+        ORDER BY p.id DESC
+        LIMIT #{param1}, #{param2}
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT count(*) FROM t5_post
+    </select>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+

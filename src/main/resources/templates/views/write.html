@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <style>
+    span {color: red;}
+  </style>
+</head>
+<body>
+<form th:action="@{/writeOk}">
+  id(<span>숫자</span>):
+  <input type="text" name="id"><br>
+  작성자(<span>*</span>):
+  <input type="text" name="name"><br>
+  제목(<span>*</span>):
+  <input type="text" name="subject"><br>
+  <input type="submit" value="등록"><br>
+</form>
+</body>
+</html>
